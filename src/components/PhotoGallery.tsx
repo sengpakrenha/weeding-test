@@ -2,15 +2,41 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import type { MemoraGalleryItem } from "@/lib/memora-assets";
+import { memoraGalleryItems } from "@/lib/memora-assets";
 import { siteConfig } from "@/lib/site-config";
 import { FadeIn } from "./FadeIn";
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+type FlatPhoto = { src: string; variant: MemoraGalleryItem["variant"] | "square" };
+
+function aspectClass(variant: FlatPhoto["variant"]) {
+  switch (variant) {
+    case "featured":
+      return "aspect-[3/4] min-h-[220px] sm:min-h-[280px] md:aspect-[4/5] md:min-h-[320px]";
+    case "landscape":
+      return "aspect-[4/3]";
+    case "portrait":
+      return "aspect-[3/4]";
+    default:
+      return "aspect-square";
+  }
+}
+
 export function PhotoGallery() {
   const { gallery } = siteConfig;
-  const photos: readonly string[] = gallery.images;
+
+  const photos: FlatPhoto[] = useMemo(() => {
+    if (gallery.useMemoraAssets) {
+      return memoraGalleryItems.map((item) => ({
+        src: item.src,
+        variant: item.variant,
+      }));
+    }
+    return gallery.images.map((src) => ({ src, variant: "square" as const }));
+  }, [gallery]);
 
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
@@ -61,42 +87,106 @@ export function PhotoGallery() {
     openIndex >= 0 &&
     openIndex < photos.length;
 
-  const activeSrc: string | undefined = lightboxOpen ? photos[openIndex] : undefined;
+  const activeSrc: string | undefined = lightboxOpen ? photos[openIndex].src : undefined;
+
+  const isMemora = gallery.useMemoraAssets;
 
   return (
-    <section id="gallery" className="section-y bg-cream">
+    <section id="gallery" className="section-y bg-[var(--memora-bg)]">
       <div className="content-wide">
         <FadeIn className="text-center">
-          <p className="font-script text-3xl text-gold md:text-4xl lg:text-[2.75rem]">Captured memories</p>
-          <h2 className="mt-5 font-serif text-3xl font-normal text-ink md:text-4xl lg:text-[2.75rem]">
+          <p className="font-khang text-3xl text-[var(--memora-text-gold)] md:text-4xl lg:text-[2.75rem]">
+            Captured memories
+          </p>
+          <h2 className="font-celinda mt-5 text-3xl font-normal text-ink md:text-4xl lg:text-[2.75rem]">
             {gallery.title}
           </h2>
         </FadeIn>
 
-        <div className="mt-16 grid grid-cols-2 gap-3 sm:gap-4 md:mt-20 md:grid-cols-3 md:gap-5">
-          {photos.map((src, index) => (
-            <FadeIn key={index} delay={(index % 3) * 0.05}>
-              <button
-                type="button"
-                onClick={() => setOpenIndex(index)}
-                className="group relative aspect-square w-full overflow-hidden rounded-sm bg-sand shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
-                aria-label={`Open photo ${index + 1}`}
-              >
-                <Image
-                  src={src}
-                  alt=""
-                  fill
-                  sizes="(max-width: 640px) 50vw, 33vw"
-                  className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.04]"
-                />
-                <span
-                  className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
-                  aria-hidden
-                />
-              </button>
-            </FadeIn>
-          ))}
-        </div>
+        {isMemora ? (
+          <div className="mt-12 md:mt-16">
+            <div className="mb-6 md:hidden">
+              <FadeIn delay={0.02}>
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(0)}
+                  className="group relative w-full overflow-hidden rounded-sm bg-sand shadow-card"
+                >
+                  <div className={`relative w-full ${aspectClass("featured")}`}>
+                    <Image
+                      src={photos[0].src}
+                      alt=""
+                      fill
+                      sizes="100vw"
+                      className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.03]"
+                      priority
+                    />
+                    <span
+                      className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
+                      aria-hidden
+                    />
+                  </div>
+                </button>
+              </FadeIn>
+            </div>
+
+            <div className="columns-2 gap-3 sm:gap-4 md:columns-3 md:gap-5">
+              {photos.map((photo, index) => (
+                <FadeIn
+                  key={photo.src}
+                  className={`mb-3 break-inside-avoid sm:mb-4 ${index === 0 ? "hidden md:block" : ""}`}
+                  delay={Math.min((index % 5) * 0.04, 0.16)}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setOpenIndex(index)}
+                    className="group relative w-full overflow-hidden rounded-sm bg-sand shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--memora-primary)] focus-visible:ring-offset-2"
+                    aria-label={`Open photo ${index + 1}`}
+                  >
+                    <div className={`relative w-full ${aspectClass(photo.variant)}`}>
+                      <Image
+                        src={photo.src}
+                        alt=""
+                        fill
+                        sizes="(max-width: 640px) 50vw, 33vw"
+                        className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.04]"
+                      />
+                      <span
+                        className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
+                        aria-hidden
+                      />
+                    </div>
+                  </button>
+                </FadeIn>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="mt-16 grid grid-cols-2 gap-3 sm:gap-4 md:mt-20 md:grid-cols-3 md:gap-5">
+            {photos.map((photo, index) => (
+              <FadeIn key={photo.src} delay={(index % 3) * 0.05}>
+                <button
+                  type="button"
+                  onClick={() => setOpenIndex(index)}
+                  className="group relative aspect-square w-full overflow-hidden rounded-sm bg-sand shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--memora-primary)] focus-visible:ring-offset-2"
+                  aria-label={`Open photo ${index + 1}`}
+                >
+                  <Image
+                    src={photo.src}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 50vw, 33vw"
+                    className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.04]"
+                  />
+                  <span
+                    className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
+                    aria-hidden
+                  />
+                </button>
+              </FadeIn>
+            ))}
+          </div>
+        )}
       </div>
 
       <AnimatePresence>
