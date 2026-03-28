@@ -16,4 +16,22 @@
   body {
     @apply bg-cream text-ink antialiased;
   }
+
+  ::selection {
+    @apply bg-gold/25 text-ink;
+  }
+}
+
+@layer utilities {
+  .section-y {
+    @apply py-24 md:py-36;
+  }
+
+  .content-narrow {
+    @apply mx-auto max-w-3xl px-6 sm:px-8;
+  }
+
+  .content-wide {
+    @apply mx-auto max-w-6xl px-6 sm:px-8;
+  }
 }

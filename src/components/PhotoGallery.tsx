@@ -1,9 +1,12 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useEffect, useState } from "react";
 import { siteConfig } from "@/lib/site-config";
 import { FadeIn } from "./FadeIn";
+
+const EASE = [0.16, 1, 0.3, 1] as const;
 
 export function PhotoGallery() {
   const { gallery } = siteConfig;
@@ -14,20 +17,21 @@ export function PhotoGallery() {
   const close = useCallback(() => setOpenIndex(null), []);
 
   const showPrev = useCallback(() => {
-  setOpenIndex((i) => {
-    if (i === null || gallery.images.length === 0) return i; // return current value, not null
-    return (i - 1 + gallery.images.length) % gallery.images.length;
-  });
-}, [gallery.images.length]);
+    setOpenIndex((i) => {
+      const len = photos.length;
+      if (i === null || len === 0) return null;
+      return (i - 1 + len) % len;
+    });
+  }, [photos]);
 
-const showNext = useCallback(() => {
-  setOpenIndex((i) => {
-    if (i === null || gallery.images.length === 0) return i; // return current value
-    return (i + 1) % gallery.images.length;
-  });
-}, [gallery.images.length]);
+  const showNext = useCallback(() => {
+    setOpenIndex((i) => {
+      const len = photos.length;
+      if (i === null || len === 0) return null;
+      return (i + 1) % len;
+    });
+  }, [photos]);
 
-  /** Close lightbox if the list shrinks or index is out of range (production-safe). */
   useEffect(() => {
     if (openIndex === null) return;
     const len = photos.length;
@@ -60,22 +64,22 @@ const showNext = useCallback(() => {
   const activeSrc: string | undefined = lightboxOpen ? photos[openIndex] : undefined;
 
   return (
-    <section id="gallery" className="bg-cream py-20 md:py-28">
-      <div className="mx-auto max-w-6xl px-6">
+    <section id="gallery" className="section-y bg-cream">
+      <div className="content-wide">
         <FadeIn className="text-center">
-          <p className="font-script text-3xl text-gold md:text-4xl">Captured memories</p>
-          <h2 className="mt-3 font-serif text-3xl font-light text-ink md:text-4xl">
+          <p className="font-script text-3xl text-gold md:text-4xl lg:text-[2.75rem]">Captured memories</p>
+          <h2 className="mt-5 font-serif text-3xl font-normal text-ink md:text-4xl lg:text-[2.75rem]">
             {gallery.title}
           </h2>
         </FadeIn>
 
-        <div className="mt-14 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+        <div className="mt-16 grid grid-cols-2 gap-3 sm:gap-4 md:mt-20 md:grid-cols-3 md:gap-5">
           {photos.map((src, index) => (
             <FadeIn key={index} delay={(index % 3) * 0.05}>
               <button
                 type="button"
                 onClick={() => setOpenIndex(index)}
-                className="group relative aspect-square w-full overflow-hidden rounded-sm bg-sand focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+                className="group relative aspect-square w-full overflow-hidden rounded-sm bg-sand shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
                 aria-label={`Open photo ${index + 1}`}
               >
                 <Image
@@ -83,10 +87,10 @@ const showNext = useCallback(() => {
                   alt=""
                   fill
                   sizes="(max-width: 640px) 50vw, 33vw"
-                  className="object-cover transition duration-500 group-hover:scale-105"
+                  className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.04]"
                 />
                 <span
-                  className="absolute inset-0 bg-ink/0 transition group-hover:bg-ink/10"
+                  className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
                   aria-hidden
                 />
               </button>
@@ -95,58 +99,85 @@ const showNext = useCallback(() => {
         </div>
       </div>
 
-      {lightboxOpen && activeSrc !== undefined ? (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/85 p-4 backdrop-blur-sm"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Photo preview"
-          onClick={close}
-        >
-          <button
-            type="button"
+      <AnimatePresence>
+        {lightboxOpen && activeSrc !== undefined ? (
+          <motion.div
+            key="lightbox"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/88 p-4 backdrop-blur-md"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Photo preview"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: EASE }}
             onClick={close}
-            className="absolute right-4 top-4 z-[60] rounded-full border border-cream/40 px-4 py-2 text-sm uppercase tracking-widest text-cream transition hover:bg-cream/10"
           >
-            Close
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              showPrev();
-            }}
-            className="absolute left-2 top-1/2 z-[60] -translate-y-1/2 rounded-full border border-cream/30 p-3 text-cream transition hover:bg-cream/10 md:left-6"
-            aria-label="Previous photo"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              showNext();
-            }}
-            className="absolute right-2 top-1/2 z-[60] -translate-y-1/2 rounded-full border border-cream/30 p-3 text-cream transition hover:bg-cream/10 md:right-6"
-            aria-label="Next photo"
-          >
-            ›
-          </button>
-          <div
-            className="relative h-[min(85vh,90vw)] w-full max-w-5xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={activeSrc}
-              alt=""
-              fill
-              className="object-contain"
-              sizes="100vw"
-              priority
-            />
-          </div>
-        </div>
-      ) : null}
+            <motion.button
+              type="button"
+              onClick={close}
+              className="absolute right-4 top-4 z-[60] rounded-full border border-cream/40 px-5 py-2.5 text-xs uppercase tracking-[0.2em] text-cream transition hover:bg-cream/10"
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.35, ease: EASE }}
+            >
+              Close
+            </motion.button>
+            <motion.button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                showPrev();
+              }}
+              className="absolute left-2 top-1/2 z-[60] -translate-y-1/2 rounded-full border border-cream/35 p-3.5 text-cream transition hover:bg-cream/10 md:left-6"
+              aria-label="Previous photo"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, duration: 0.35, ease: EASE }}
+            >
+              ‹
+            </motion.button>
+            <motion.button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                showNext();
+              }}
+              className="absolute right-2 top-1/2 z-[60] -translate-y-1/2 rounded-full border border-cream/35 p-3.5 text-cream transition hover:bg-cream/10 md:right-6"
+              aria-label="Next photo"
+              initial={{ opacity: 0, x: 8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1, duration: 0.35, ease: EASE }}
+            >
+              ›
+            </motion.button>
+            <div
+              className="relative h-[min(85vh,92vw)] w-full max-w-5xl"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={openIndex}
+                  className="relative h-full w-full"
+                  initial={{ opacity: 0, scale: 0.97 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.98 }}
+                  transition={{ duration: 0.4, ease: EASE }}
+                >
+                  <Image
+                    src={activeSrc}
+                    alt=""
+                    fill
+                    className="object-contain"
+                    sizes="100vw"
+                    priority
+                  />
+                </motion.div>
+              </AnimatePresence>
+            </div>
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
     </section>
   );
 }

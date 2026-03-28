@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Cormorant_Garamond, Great_Vibes } from "next/font/google";
+import { Great_Vibes, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/site-config";
 
-const serif = Cormorant_Garamond({
+const serif = Playfair_Display({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-serif",
   display: "swap",
 });

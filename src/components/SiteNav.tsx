@@ -12,24 +12,31 @@ const links = [
   ...(siteConfig.rsvp.enabled ? [{ href: "#rsvp", label: "RSVP" }] : []),
 ];
 
-export function SiteNav() {
+type SiteNavProps = {
+  /** Hide entire nav while the cover invitation is visible */
+  visible?: boolean;
+};
+
+export function SiteNav({ visible = true }: SiteNavProps) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 48);
+    const onScroll = () => setScrolled(window.scrollY > 56);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  if (!visible) return null;
+
   return (
     <header
-      className={`fixed left-0 right-0 top-0 z-40 transition-colors duration-300 ${
-        scrolled ? "bg-cream/90 shadow-sm backdrop-blur-md" : "bg-transparent"
+      className={`fixed left-0 right-0 top-0 z-40 transition-all duration-500 ease-cinematic ${
+        scrolled ? "bg-cream/95 py-3 shadow-card backdrop-blur-md" : "bg-transparent py-5"
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 sm:px-8">
         <a
           href="#home"
           className={`font-script text-xl transition md:text-2xl ${
@@ -38,12 +45,12 @@ export function SiteNav() {
         >
           {siteConfig.couple.partner1} & {siteConfig.couple.partner2}
         </a>
-        <nav className="hidden items-center gap-8 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-10 md:flex" aria-label="Main">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className={`text-xs uppercase tracking-[0.2em] transition ${
+              className={`text-[11px] uppercase tracking-[0.22em] transition ${
                 scrolled
                   ? "text-muted hover:text-gold-dark"
                   : "text-cream/90 hover:text-gold-light"
@@ -73,14 +80,14 @@ export function SiteNav() {
       {open ? (
         <div
           id="mobile-nav"
-          className="border-t border-sand bg-cream px-6 py-4 md:hidden"
+          className="border-t border-sand/80 bg-cream/98 px-6 py-5 backdrop-blur-md md:hidden"
         >
-          <nav className="flex flex-col gap-4" aria-label="Mobile">
+          <nav className="flex flex-col gap-5" aria-label="Mobile">
             {links.map((l) => (
               <a
                 key={l.href}
                 href={l.href}
-                className="text-sm uppercase tracking-widest text-muted"
+                className="text-xs uppercase tracking-[0.2em] text-muted"
                 onClick={() => setOpen(false)}
               >
                 {l.label}

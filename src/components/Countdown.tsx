@@ -34,10 +34,7 @@ function pad(n: number) {
 }
 
 export function Countdown() {
-  const target = useMemo(
-    () => new Date(siteConfig.weddingDateISO),
-    []
-  );
+  const target = useMemo(() => new Date(siteConfig.weddingDateISO), []);
   const [remaining, setRemaining] = useState<Remaining>(() => getRemaining(target));
 
   useEffect(() => {
@@ -57,16 +54,18 @@ export function Countdown() {
       ];
 
   return (
-    <section id="countdown" className="border-y border-gold/20 bg-white py-20 md:py-24">
-      <div className="mx-auto max-w-4xl px-6 text-center">
+    <section id="countdown" className="border-y border-gold/15 bg-white section-y">
+      <div className="content-narrow text-center">
         <FadeIn>
-          <p className="font-script text-3xl text-gold md:text-4xl">{siteConfig.countdown.title}</p>
-          <p className="mt-2 font-serif text-lg text-muted">{siteConfig.weddingDateDisplay}</p>
+          <p className="font-script text-3xl text-gold md:text-4xl lg:text-[2.75rem]">
+            {siteConfig.countdown.title}
+          </p>
+          <p className="mt-4 font-serif text-lg text-muted md:text-xl">{siteConfig.weddingDateDisplay}</p>
         </FadeIn>
 
-        <FadeIn className="mt-12" delay={0.1}>
+        <FadeIn className="mt-14 md:mt-16" delay={0.1}>
           {remaining.past ? (
-            <p className="font-serif text-2xl font-light text-ink md:text-3xl">
+            <p className="font-serif text-2xl font-normal leading-relaxed text-ink md:text-3xl">
               We’re married — thank you for being part of our story.
             </p>
           ) : (
@@ -74,12 +73,12 @@ export function Countdown() {
               {blocks?.map((b) => (
                 <div
                   key={b.label}
-                  className="border border-gold/30 bg-cream/80 px-3 py-6 sm:py-8"
+                  className="border border-gold/25 bg-cream/90 px-4 py-8 shadow-card sm:py-10"
                 >
                   <span className="font-serif text-3xl tabular-nums text-ink sm:text-4xl md:text-5xl">
                     {b.label === "Seconds" ? pad(b.value) : b.value}
                   </span>
-                  <p className="mt-2 text-xs uppercase tracking-[0.2em] text-muted">{b.label}</p>
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-muted">{b.label}</p>
                 </div>
               ))}
             </div>

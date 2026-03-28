@@ -16,6 +16,21 @@ export const siteConfig = {
   /** Long-form date for hero / cards */
   weddingDateDisplay: "Saturday, September 12, 2026",
 
+  /** Fullscreen cover before the site — optional image override */
+  cover: {
+    /** Set to a URL string to override hero image; `null` uses hero.backgroundImage */
+    backgroundImage: null,
+  },
+
+  /**
+   * Background music after "Open Invitation". Replace `src` with your MP3 in /public.
+   * Demo URL works for development; host your own file for production.
+   */
+  music: {
+    enabled: true,
+    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+  },
+
   hero: {
     /** Full-bleed background — swap for /your-photo.jpg in public/ */
     backgroundImage:
