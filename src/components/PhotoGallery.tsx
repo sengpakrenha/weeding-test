@@ -7,21 +7,36 @@ import { FadeIn } from "./FadeIn";
 
 export function PhotoGallery() {
   const { gallery } = siteConfig;
+  const photos: readonly string[] = gallery.images;
+
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   const close = useCallback(() => setOpenIndex(null), []);
+
   const showPrev = useCallback(() => {
     setOpenIndex((i) => {
-      if (i === null || gallery.images.length === 0) return null;
-      return (i - 1 + gallery.images.length) % gallery.images.length;
+      const len = photos.length;
+      if (i === null || len === 0) return null;
+      return (i - 1 + len) % len;
     });
-  }, [gallery.images.length]);
+  }, [photos]);
+
   const showNext = useCallback(() => {
     setOpenIndex((i) => {
-      if (i === null || gallery.images.length === 0) return null;
-      return (i + 1) % gallery.images.length;
+      const len = photos.length;
+      if (i === null || len === 0) return null;
+      return (i + 1) % len;
     });
-  }, [gallery.images.length]);
+  }, [photos]);
+
+  /** Close lightbox if the list shrinks or index is out of range (production-safe). */
+  useEffect(() => {
+    if (openIndex === null) return;
+    const len = photos.length;
+    if (len === 0 || openIndex < 0 || openIndex >= len) {
+      setOpenIndex(null);
+    }
+  }, [openIndex, photos]);
 
   useEffect(() => {
     if (openIndex === null) return;
@@ -38,6 +53,14 @@ export function PhotoGallery() {
     };
   }, [openIndex, close, showPrev, showNext]);
 
+  const lightboxOpen =
+    openIndex !== null &&
+    photos.length > 0 &&
+    openIndex >= 0 &&
+    openIndex < photos.length;
+
+  const activeSrc: string | undefined = lightboxOpen ? photos[openIndex] : undefined;
+
   return (
     <section id="gallery" className="bg-cream py-20 md:py-28">
       <div className="mx-auto max-w-6xl px-6">
@@ -49,7 +72,7 @@ export function PhotoGallery() {
         </FadeIn>
 
         <div className="mt-14 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
-          {gallery.images.map((src, index) => (
+          {photos.map((src, index) => (
             <FadeIn key={index} delay={(index % 3) * 0.05}>
               <button
                 type="button"
@@ -74,7 +97,7 @@ export function PhotoGallery() {
         </div>
       </div>
 
-      {openIndex !== null ? (
+      {lightboxOpen && activeSrc !== undefined ? (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-ink/85 p-4 backdrop-blur-sm"
           role="dialog"
@@ -116,7 +139,7 @@ export function PhotoGallery() {
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={gallery.images[openIndex]}
+              src={activeSrc}
               alt=""
               fill
               className="object-contain"
