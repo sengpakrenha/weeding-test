@@ -101,6 +101,7 @@ export function MusicPlayer({ shouldPlay }: MusicPlayerProps) {
 
     const start = performance.now();
     function step(now: number) {
+      if (!el) return;
       const t = Math.min(1, (now - start) / FADE_IN_MS);
       el.volume = TARGET_VOL * t;
       el.muted = false;
