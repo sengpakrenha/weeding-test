@@ -3,19 +3,18 @@
 import { AnimatePresence, motion } from "framer-motion";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { EASE } from "@/lib/motion";
 import type { MemoraGalleryItem } from "@/lib/memora-assets";
 import { memoraGalleryItems } from "@/lib/memora-assets";
 import { siteConfig } from "@/lib/site-config";
 import { FadeIn } from "./FadeIn";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
 
 type FlatPhoto = { src: string; variant: MemoraGalleryItem["variant"] | "square" };
 
 function aspectClass(variant: FlatPhoto["variant"]) {
   switch (variant) {
     case "featured":
-      return "aspect-[3/4] min-h-[220px] sm:min-h-[280px] md:aspect-[4/5] md:min-h-[320px]";
+      return "aspect-[3/4] min-h-[220px] sm:min-h-[280px] md:aspect-[4/5] md:min-h-[300px]";
     case "landscape":
       return "aspect-[4/3]";
     case "portrait":
@@ -91,26 +90,25 @@ export function PhotoGallery() {
 
   const isMemora = gallery.useMemoraAssets;
 
+  const tileClass =
+    "group relative w-full overflow-hidden rounded-xl bg-sand ring-1 ring-black/[0.04] transition duration-500 ease-cinematic hover:z-[1] hover:scale-[1.05] hover:shadow-luxe focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--memora-primary)] focus-visible:ring-offset-2";
+
   return (
-    <section id="gallery" className="section-y bg-[var(--memora-bg)]">
+    <section id="gallery" className="border-t border-gold/10 bg-[var(--memora-bg)] section-y">
       <div className="content-wide">
         <FadeIn className="text-center">
-          <p className="font-khang text-3xl text-[var(--memora-text-gold)] md:text-4xl lg:text-[2.75rem]">
-            Captured memories
-          </p>
-          <h2 className="font-celinda mt-5 text-3xl font-normal text-ink md:text-4xl lg:text-[2.75rem]">
-            {gallery.title}
-          </h2>
+          <p className="memora-eyebrow text-[var(--memora-text-gold)]">Captured memories</p>
+          <h2 className="memora-section-title mt-3 text-ink">{gallery.title}</h2>
         </FadeIn>
 
         {isMemora ? (
-          <div className="mt-12 md:mt-16">
-            <div className="mb-6 md:hidden">
+          <div className="mt-12 md:mt-14">
+            <div className="mb-7 md:hidden">
               <FadeIn delay={0.02}>
                 <button
                   type="button"
                   onClick={() => setOpenIndex(0)}
-                  className="group relative w-full overflow-hidden rounded-sm bg-sand shadow-card"
+                  className="group relative w-full overflow-hidden rounded-xl bg-sand shadow-card ring-1 ring-black/[0.04] transition duration-500 ease-cinematic hover:scale-[1.02] hover:shadow-luxe"
                 >
                   <div className={`relative w-full ${aspectClass("featured")}`}>
                     <Image
@@ -118,7 +116,7 @@ export function PhotoGallery() {
                       alt=""
                       fill
                       sizes="100vw"
-                      className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.03]"
+                      className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.05]"
                       priority
                     />
                     <span
@@ -130,26 +128,21 @@ export function PhotoGallery() {
               </FadeIn>
             </div>
 
-            <div className="columns-2 gap-3 sm:gap-4 md:columns-3 md:gap-5">
+            <div className="columns-2 gap-4 sm:gap-5 md:columns-3 md:gap-5 lg:gap-6">
               {photos.map((photo, index) => (
                 <FadeIn
                   key={photo.src}
-                  className={`mb-3 break-inside-avoid sm:mb-4 ${index === 0 ? "hidden md:block" : ""}`}
+                  className={`mb-4 break-inside-avoid sm:mb-5 ${index === 0 ? "hidden md:block" : ""}`}
                   delay={Math.min((index % 5) * 0.04, 0.16)}
                 >
-                  <button
-                    type="button"
-                    onClick={() => setOpenIndex(index)}
-                    className="group relative w-full overflow-hidden rounded-sm bg-sand shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--memora-primary)] focus-visible:ring-offset-2"
-                    aria-label={`Open photo ${index + 1}`}
-                  >
+                  <button type="button" onClick={() => setOpenIndex(index)} className={tileClass} aria-label={`Open photo ${index + 1}`}>
                     <div className={`relative w-full ${aspectClass(photo.variant)}`}>
                       <Image
                         src={photo.src}
                         alt=""
                         fill
                         sizes="(max-width: 640px) 50vw, 33vw"
-                        className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.04]"
+                        className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.06]"
                       />
                       <span
                         className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
@@ -162,26 +155,23 @@ export function PhotoGallery() {
             </div>
           </div>
         ) : (
-          <div className="mt-16 grid grid-cols-2 gap-3 sm:gap-4 md:mt-20 md:grid-cols-3 md:gap-5">
+          <div className="mt-12 grid grid-cols-2 gap-3 sm:mt-14 sm:gap-4 md:grid-cols-3 md:gap-5">
             {photos.map((photo, index) => (
               <FadeIn key={photo.src} delay={(index % 3) * 0.05}>
-                <button
-                  type="button"
-                  onClick={() => setOpenIndex(index)}
-                  className="group relative aspect-square w-full overflow-hidden rounded-sm bg-sand shadow-card focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--memora-primary)] focus-visible:ring-offset-2"
-                  aria-label={`Open photo ${index + 1}`}
-                >
-                  <Image
-                    src={photo.src}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 50vw, 33vw"
-                    className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.04]"
-                  />
-                  <span
-                    className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
-                    aria-hidden
-                  />
+                <button type="button" onClick={() => setOpenIndex(index)} className={tileClass} aria-label={`Open photo ${index + 1}`}>
+                  <div className="relative aspect-square w-full">
+                    <Image
+                      src={photo.src}
+                      alt=""
+                      fill
+                      sizes="(max-width: 640px) 50vw, 33vw"
+                      className="object-cover transition duration-700 ease-cinematic group-hover:scale-[1.06]"
+                    />
+                    <span
+                      className="absolute inset-0 bg-ink/0 transition duration-500 group-hover:bg-ink/[0.12]"
+                      aria-hidden
+                    />
+                  </div>
                 </button>
               </FadeIn>
             ))}
@@ -193,14 +183,14 @@ export function PhotoGallery() {
         {lightboxOpen && activeSrc !== undefined ? (
           <motion.div
             key="lightbox"
-            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/88 p-4 backdrop-blur-md"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-4 backdrop-blur-2xl"
             role="dialog"
             aria-modal="true"
             aria-label="Photo preview"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.35, ease: EASE }}
+            transition={{ duration: 0.4, ease: EASE }}
             onClick={close}
           >
             <motion.button
@@ -249,10 +239,10 @@ export function PhotoGallery() {
                 <motion.div
                   key={openIndex}
                   className="relative h-full w-full"
-                  initial={{ opacity: 0, scale: 0.97 }}
+                  initial={{ opacity: 0, scale: 0.96 }}
                   animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0, scale: 0.98 }}
-                  transition={{ duration: 0.4, ease: EASE }}
+                  transition={{ duration: 0.45, ease: EASE }}
                 >
                   <Image
                     src={activeSrc}

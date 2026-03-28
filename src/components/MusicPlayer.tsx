@@ -1,12 +1,18 @@
 "use client";
 
+import { motion, useReducedMotion } from "framer-motion";
+import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { EASE } from "@/lib/motion";
+import { memoraUrls } from "@/lib/memora-assets";
 import { siteConfig } from "@/lib/site-config";
 
 const STORAGE_KEY = "wedding-music-muted";
+const TARGET_VOL = 0.3;
+const FADE_IN_MS = 1500;
+const FADE_TOGGLE_MS = 320;
 
 type MusicPlayerProps = {
-  /** When true, user has opened the invitation — audio may play */
   shouldPlay: boolean;
 };
 
@@ -26,61 +32,126 @@ function IconVolumeOff() {
   );
 }
 
+function fadeVolume(
+  el: HTMLAudioElement,
+  from: number,
+  to: number,
+  durationMs: number,
+  onDone?: () => void
+) {
+  const start = performance.now();
+  function tick(now: number) {
+    const t = Math.min(1, (now - start) / durationMs);
+    el.volume = Math.max(0, Math.min(1, from + (to - from) * t));
+    if (t < 1) {
+      requestAnimationFrame(tick);
+    } else if (onDone) {
+      onDone();
+    }
+  }
+  requestAnimationFrame(tick);
+}
+
 export function MusicPlayer({ shouldPlay }: MusicPlayerProps) {
   const { music } = siteConfig;
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const [muted, setMuted] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const reduceMotion = useReducedMotion();
+  const entryDoneRef = useRef(false);
+  const rafRef = useRef<number | null>(null);
+  const mutedRef = useRef(muted);
+  mutedRef.current = muted;
 
   useEffect(() => {
-    setHydrated(true);
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored === "true") setMuted(true);
+      if (localStorage.getItem(STORAGE_KEY) === "true") setMuted(true);
     } catch {
       /* ignore */
     }
+    setHydrated(true);
   }, []);
 
-  const syncAudio = useCallback(() => {
-    const el = audioRef.current;
-    if (!el) return;
-    el.muted = muted;
-    el.volume = 0.35;
-  }, [muted]);
-
   useEffect(() => {
-    syncAudio();
-  }, [syncAudio, muted]);
+    if (!shouldPlay) {
+      entryDoneRef.current = false;
+    }
+  }, [shouldPlay]);
 
   useEffect(() => {
     if (!music.enabled || !shouldPlay || !hydrated) return;
     const el = audioRef.current;
-    if (!el) return;
-    syncAudio();
-    void el.play().catch(() => {
-      /* autoplay may be blocked until user interacts */
-    });
-  }, [shouldPlay, music.enabled, hydrated, syncAudio]);
+    if (!el || entryDoneRef.current) return;
+
+    entryDoneRef.current = true;
+    el.muted = false;
+    el.volume = 0;
+    void el.play().catch(() => {});
+
+    if (mutedRef.current) {
+      el.volume = 0;
+      el.muted = true;
+      return;
+    }
+
+    if (reduceMotion) {
+      el.volume = TARGET_VOL;
+      return;
+    }
+
+    const start = performance.now();
+    function step(now: number) {
+      const t = Math.min(1, (now - start) / FADE_IN_MS);
+      el.volume = TARGET_VOL * t;
+      el.muted = false;
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(step);
+      } else {
+        rafRef.current = null;
+      }
+    }
+    rafRef.current = requestAnimationFrame(step);
+
+    return () => {
+      if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    };
+  }, [shouldPlay, hydrated, music.enabled, reduceMotion]);
 
   const toggleMute = useCallback(() => {
-    setMuted((prev) => {
-      const next = !prev;
-      try {
-        localStorage.setItem(STORAGE_KEY, String(next));
-      } catch {
-        /* ignore */
-      }
-      const el = audioRef.current;
-      if (el) {
-        el.muted = next;
-        if (!next && shouldPlay) {
-          void el.play().catch(() => {});
-        }
-      }
-      return next;
-    });
-  }, [shouldPlay]);
+    const el = audioRef.current;
+    const next = !muted;
+
+    try {
+      localStorage.setItem(STORAGE_KEY, String(next));
+    } catch {
+      /* ignore */
+    }
+
+    if (!el) {
+      setMuted(next);
+      return;
+    }
+
+    if (reduceMotion) {
+      el.muted = next;
+      el.volume = next ? 0 : TARGET_VOL;
+      setMuted(next);
+      return;
+    }
+
+    if (next) {
+      fadeVolume(el, el.volume, 0, FADE_TOGGLE_MS, () => {
+        el.muted = true;
+        setMuted(true);
+      });
+    } else {
+      el.muted = false;
+      fadeVolume(el, el.volume, TARGET_VOL, FADE_TOGGLE_MS, () => {
+        setMuted(false);
+      });
+      void el.play().catch(() => {});
+    }
+  }, [muted, reduceMotion]);
 
   if (!music.enabled) return null;
 
@@ -88,15 +159,30 @@ export function MusicPlayer({ shouldPlay }: MusicPlayerProps) {
     <>
       <audio ref={audioRef} src={music.src} loop playsInline preload="auto" className="hidden" />
       {shouldPlay && hydrated ? (
-        <button
+        <motion.button
           type="button"
           onClick={toggleMute}
-          className="fixed bottom-6 right-6 z-[90] flex h-12 w-12 items-center justify-center rounded-full border border-gold/35 bg-cream/95 text-ink shadow-luxe backdrop-blur-md transition hover:border-gold hover:bg-ivory focus:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2"
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.92 }}
+          transition={{ duration: 0.35, ease: EASE }}
+          className="fixed bottom-6 right-6 z-[90] flex h-14 w-14 items-center justify-center rounded-full border border-white/45 bg-white/18 text-ink shadow-luxe backdrop-blur-xl ring-1 ring-black/[0.06] transition-colors hover:bg-white/28 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--memora-primary)] focus-visible:ring-offset-2"
           aria-label={muted ? "Unmute background music" : "Mute background music"}
           title={muted ? "Unmute music" : "Mute music"}
         >
-          {muted ? <IconVolumeOff /> : <IconVolumeOn />}
-        </button>
+          {muted ? (
+            <IconVolumeOff />
+          ) : music.useMemoraIcon ? (
+            <Image
+              src={memoraUrls.soundOn}
+              alt=""
+              width={22}
+              height={22}
+              className="h-5 w-5 object-contain"
+            />
+          ) : (
+            <IconVolumeOn />
+          )}
+        </motion.button>
       ) : null}
     </>
   );

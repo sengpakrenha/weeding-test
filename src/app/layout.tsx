@@ -3,14 +3,14 @@ import { Great_Vibes, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { siteConfig } from "@/lib/site-config";
 
-const serif = Playfair_Display({
+const playfair = Playfair_Display({
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-  variable: "--font-serif",
+  variable: "--font-heading",
   display: "swap",
 });
 
-const script = Great_Vibes({
+const greatVibes = Great_Vibes({
   subsets: ["latin"],
   weight: "400",
   variable: "--font-script",
@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${serif.variable} ${script.variable}`}>
-      <body className="font-serif">{children}</body>
+    <html lang="en" className={`${playfair.variable} ${greatVibes.variable}`}>
+      <body className="font-body">{children}</body>
     </html>
   );
 }

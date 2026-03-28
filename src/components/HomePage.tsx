@@ -2,6 +2,7 @@
 
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { EASE } from "@/lib/motion";
 import { Countdown } from "@/components/Countdown";
 import { CoverPage } from "@/components/CoverPage";
 import { EventDetails } from "@/components/EventDetails";
@@ -47,8 +48,8 @@ export function HomePage() {
           pointerEvents: invitationActive ? "auto" : "none",
         }}
         transition={{
-          duration: 1.05,
-          ease: [0.16, 1, 0.3, 1],
+          duration: 1,
+          ease: EASE,
         }}
         className="min-h-screen"
         aria-hidden={coverVisible}

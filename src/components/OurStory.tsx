@@ -6,30 +6,26 @@ export function OurStory() {
   const { story } = siteConfig;
 
   return (
-    <section id="story" className="section-y bg-ivory">
+    <section id="story" className="border-t border-gold/10 bg-ivory section-y">
       <div className="content-narrow text-center">
         <FadeIn>
-          <p className="font-script text-3xl text-gold md:text-4xl lg:text-[2.75rem]">Chapter by chapter</p>
-          <h2 className="mt-5 font-serif text-3xl font-normal text-ink md:text-4xl lg:text-[2.75rem]">
-            {story.title}
-          </h2>
-          <p className="mx-auto mt-8 max-w-xl text-base leading-[1.85] text-muted md:text-lg">
-            {story.intro}
-          </p>
+          <p className="memora-eyebrow text-gold">Chapter by chapter</p>
+          <h2 className="memora-section-title mt-3 text-ink">{story.title}</h2>
+          <p className="memora-section-lead mx-auto mt-7 max-w-xl">{story.intro}</p>
         </FadeIn>
       </div>
 
-      <div className="mx-auto mt-20 max-w-5xl space-y-24 px-6 sm:px-8 md:mt-28 md:space-y-32">
+      <div className="content-wide mt-16 space-y-20 md:mt-20 md:space-y-24">
         {story.milestones.map((item, index) => (
           <FadeIn key={item.title} delay={index * 0.05}>
             <article
-              className={`grid gap-12 md:grid-cols-2 md:items-center md:gap-16 ${
+              className={`grid gap-10 md:grid-cols-2 md:items-center md:gap-14 ${
                 index % 2 === 1
                   ? "md:[&>div:first-child]:order-2 md:[&>div:last-child]:order-1"
                   : ""
               }`}
             >
-              <div className="relative aspect-[4/3] overflow-hidden rounded-sm shadow-luxe">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-xl shadow-luxe ring-1 ring-black/[0.04]">
                 <Image
                   src={item.image}
                   alt=""
@@ -39,11 +35,13 @@ export function OurStory() {
                 />
               </div>
               <div className="text-center md:text-left">
-                <p className="font-script text-2xl text-gold md:text-3xl">{item.date}</p>
-                <h3 className="mt-3 font-serif text-2xl font-normal text-ink md:text-3xl lg:text-4xl">
+                <p className="font-script text-xl text-gold md:text-2xl">{item.date}</p>
+                <h3 className="font-heading mt-2.5 text-2xl font-medium tracking-tight text-ink md:text-3xl">
                   {item.title}
                 </h3>
-                <p className="mt-6 text-base leading-[1.85] text-muted md:text-lg">{item.description}</p>
+                <p className="mt-5 text-[0.9375rem] leading-[1.82] text-muted md:text-base md:leading-[1.85]">
+                  {item.description}
+                </p>
               </div>
             </article>
           </FadeIn>

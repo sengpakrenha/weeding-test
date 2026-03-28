@@ -16,10 +16,15 @@ export const siteConfig = {
   /** Long-form date for hero / cards */
   weddingDateDisplay: "Saturday, September 12, 2026",
 
-  /** Fullscreen cover before the site — optional image override */
+  /** Fullscreen cover before the site */
   cover: {
-    /** Set to a URL string to override hero image; `null` uses hero.backgroundImage */
+    /** Your own image URL, or `null` when using Memora assets / hero */
     backgroundImage: null,
+    /**
+     * When true, uses Memora demo cover art (background.webp, monogram, heading strip).
+     * Set false and provide `backgroundImage` or rely on `hero.backgroundImage` only.
+     */
+    useMemoraAssets: true,
   },
 
   /**
@@ -28,6 +33,8 @@ export const siteConfig = {
    */
   music: {
     enabled: true,
+    /** Use Memora demo speaker icon in the floating control */
+    useMemoraIcon: true,
     src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
   },
 
@@ -94,7 +101,12 @@ export const siteConfig = {
 
   gallery: {
     title: "Moments",
-    /** Add as many image URLs as you like */
+    /**
+     * When true, uses Memora demo gallery (portrait-main + landscape / portrait mix).
+     * When false, uses `images` below (square grid).
+     */
+    useMemoraAssets: true,
+    /** Used when useMemoraAssets is false */
     images: [
       "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80",
       "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80",

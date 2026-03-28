@@ -54,31 +54,31 @@ export function Countdown() {
       ];
 
   return (
-    <section id="countdown" className="border-y border-gold/15 bg-white section-y">
+    <section id="countdown" className="border-y border-gold/10 bg-white section-y">
       <div className="content-narrow text-center">
         <FadeIn>
-          <p className="font-script text-3xl text-gold md:text-4xl lg:text-[2.75rem]">
-            {siteConfig.countdown.title}
+          <p className="memora-eyebrow text-gold">{siteConfig.countdown.title}</p>
+          <p className="mt-3 font-heading text-sm font-normal tracking-[0.14em] text-muted md:text-[0.9375rem]">
+            {siteConfig.weddingDateDisplay}
           </p>
-          <p className="mt-4 font-serif text-lg text-muted md:text-xl">{siteConfig.weddingDateDisplay}</p>
         </FadeIn>
 
-        <FadeIn className="mt-14 md:mt-16" delay={0.1}>
+        <FadeIn className="mt-12 md:mt-14" delay={0.1}>
           {remaining.past ? (
-            <p className="font-serif text-2xl font-normal leading-relaxed text-ink md:text-3xl">
+            <p className="font-heading text-xl font-normal leading-relaxed text-ink md:text-2xl">
               We’re married — thank you for being part of our story.
             </p>
           ) : (
-            <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 sm:gap-6">
+            <div className="mx-auto grid max-w-4xl grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4 md:gap-5">
               {blocks?.map((b) => (
                 <div
                   key={b.label}
-                  className="border border-gold/25 bg-cream/90 px-4 py-8 shadow-card sm:py-10"
+                  className="rounded-xl border border-gold/18 bg-white/95 px-3 py-8 shadow-card sm:px-4 sm:py-10"
                 >
-                  <span className="font-serif text-3xl tabular-nums text-ink sm:text-4xl md:text-5xl">
+                  <span className="font-heading text-[clamp(2.25rem,6vw,3.75rem)] tabular-nums leading-none text-ink">
                     {b.label === "Seconds" ? pad(b.value) : b.value}
                   </span>
-                  <p className="mt-3 text-[10px] uppercase tracking-[0.22em] text-muted">{b.label}</p>
+                  <p className="mt-3 text-[10px] uppercase tracking-[0.24em] text-muted">{b.label}</p>
                 </div>
               ))}
             </div>

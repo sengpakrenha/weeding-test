@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: Celinda;
+  src: url("/fonts/Celinda-Regular.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: KhAngTaPenh;
+  src: url("/fonts/KhAngTaPenh.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
@@ -14,24 +30,148 @@
   }
 
   body {
-    @apply bg-cream text-ink antialiased;
+    @apply bg-[var(--memora-bg)] text-ink antialiased;
+    font-family: Celinda, Georgia, "Times New Roman", serif;
   }
 
   ::selection {
-    @apply bg-gold/25 text-ink;
+    @apply bg-[color-mix(in_srgb,var(--memora-primary)_25%,transparent)] text-ink;
   }
+}
+
+:root {
+  --memora-primary: #f2b83e;
+  --memora-secondary: #f5bc43;
+  --memora-accent: #d4a037;
+  --memora-bg: #fdf6f7;
+  --memora-text-gold: #d9af56;
+
+  /* Memora demo–aligned rhythm (spacing + type scale) */
+  --memora-section-py: 5rem;
+  --memora-section-py-md: 6rem;
+  --memora-section-py-lg: 7rem;
+  --memora-eyebrow: clamp(1.625rem, 3.15vw, 2.125rem);
+  --memora-section-heading: clamp(1.8125rem, 3.1vw, 2.5rem);
+  --memora-hero-eyebrow: clamp(1.875rem, 4vw, 2.875rem);
+  --memora-hero-names: clamp(2.125rem, 5.25vw, 3.75rem);
+  --memora-body: 0.9375rem;
+  --memora-body-lg: 1.0625rem;
 }
 
 @layer utilities {
   .section-y {
-    @apply py-24 md:py-36;
+    padding-top: var(--memora-section-py);
+    padding-bottom: var(--memora-section-py);
+  }
+
+  @media (min-width: 768px) {
+    .section-y {
+      padding-top: var(--memora-section-py-md);
+      padding-bottom: var(--memora-section-py-md);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .section-y {
+      padding-top: var(--memora-section-py-lg);
+      padding-bottom: var(--memora-section-py-lg);
+    }
   }
 
   .content-narrow {
-    @apply mx-auto max-w-3xl px-6 sm:px-8;
+    @apply mx-auto max-w-[40rem] px-5 sm:px-6 lg:px-8;
   }
 
   .content-wide {
-    @apply mx-auto max-w-6xl px-6 sm:px-8;
+    @apply mx-auto max-w-[68rem] px-5 sm:px-6 lg:px-8;
+  }
+
+  /** Script line above section titles — matches Memora proportions */
+  .memora-eyebrow {
+    font-family: var(--font-script), cursive;
+    font-size: var(--memora-eyebrow);
+    line-height: 1.1;
+    letter-spacing: 0.02em;
+  }
+
+  /** Serif section title */
+  .memora-section-title {
+    font-family: var(--font-heading), Georgia, "Times New Roman", serif;
+    font-size: var(--memora-section-heading);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  /** Intro / subtitle under section headers */
+  .memora-section-lead {
+    font-size: var(--memora-body);
+    line-height: 1.78;
+    @apply text-muted;
+  }
+
+  @media (min-width: 768px) {
+    .memora-section-lead {
+      font-size: 1rem;
+      line-height: 1.82;
+    }
+  }
+
+  /** Full-bleed hero script + names */
+  .memora-hero-eyebrow {
+    font-family: var(--font-script), cursive;
+    font-size: var(--memora-hero-eyebrow);
+    line-height: 1.08;
+    letter-spacing: 0.02em;
+  }
+
+  .memora-hero-names {
+    font-family: var(--font-heading), Georgia, "Times New Roman", serif;
+    font-size: var(--memora-hero-names);
+    font-weight: 500;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+  }
+
+  /** Cover screen — slightly larger than in-page hero for parity with Memora fullscreen */
+  .memora-cover-names {
+    font-family: var(--font-heading), Georgia, "Times New Roman", serif;
+    font-size: clamp(2.25rem, 6.25vw, 4rem);
+    font-weight: 500;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+  }
+
+  .memora-hero-ampersand {
+    font-family: var(--font-script), cursive;
+    font-size: clamp(1.75rem, 4.5vw, 2.75rem);
+    line-height: 1;
+  }
+
+  .memora-date-line {
+    font-family: var(--font-heading), Georgia, "Times New Roman", serif;
+    font-size: clamp(0.75rem, 1.6vw, 0.9375rem);
+    letter-spacing: 0.32em;
+    line-height: 1.5;
+  }
+
+  .font-heading {
+    font-family: var(--font-heading), Georgia, "Times New Roman", serif;
+  }
+
+  .font-script {
+    font-family: var(--font-script), cursive;
+  }
+
+  .font-body {
+    font-family: Celinda, Georgia, "Times New Roman", serif;
+  }
+
+  .font-khang {
+    font-family: KhAngTaPenh, "Noto Sans Khmer", "Khmer OS", system-ui, sans-serif;
+  }
+
+  .section-divider {
+    @apply mx-auto h-px max-w-md bg-gradient-to-r from-transparent via-gold/25 to-transparent;
   }
 }

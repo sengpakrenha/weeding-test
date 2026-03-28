@@ -33,27 +33,27 @@ export function SiteNav({ visible = true }: SiteNavProps) {
   return (
     <header
       className={`fixed left-0 right-0 top-0 z-40 transition-all duration-500 ease-cinematic ${
-        scrolled ? "bg-cream/95 py-3 shadow-card backdrop-blur-md" : "bg-transparent py-5"
+        scrolled ? "bg-cream/95 py-2.5 shadow-card backdrop-blur-md" : "bg-transparent py-4 md:py-5"
       }`}
     >
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-6 sm:px-8">
+      <div className="mx-auto flex max-w-[68rem] items-center justify-between px-5 sm:px-6 lg:px-8">
         <a
           href="#home"
-          className={`font-script text-xl transition md:text-2xl ${
-            scrolled ? "text-gold-dark" : "text-cream"
+          className={`font-heading text-lg font-medium tracking-tight transition md:text-xl ${
+            scrolled ? "text-memora-accent" : "text-cream"
           }`}
         >
           {siteConfig.couple.partner1} & {siteConfig.couple.partner2}
         </a>
-        <nav className="hidden items-center gap-10 md:flex" aria-label="Main">
+        <nav className="hidden items-center gap-7 lg:gap-9" aria-label="Main">
           {links.map((l) => (
             <a
               key={l.href}
               href={l.href}
-              className={`text-[11px] uppercase tracking-[0.22em] transition ${
+              className={`text-[10px] uppercase tracking-[0.24em] transition ${
                 scrolled
-                  ? "text-muted hover:text-gold-dark"
-                  : "text-cream/90 hover:text-gold-light"
+                  ? "text-muted hover:text-memora-accent"
+                  : "text-cream/90 hover:text-[var(--memora-primary)]"
               }`}
             >
               {l.label}

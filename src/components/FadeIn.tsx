@@ -2,8 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import type { ReactNode } from "react";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
+import { EASE } from "@/lib/motion";
 
 type FadeInProps = {
   children: ReactNode;
@@ -25,7 +24,7 @@ export function FadeIn({ children, className, delay = 0 }: FadeInProps) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-80px", amount: 0.15 }}
       transition={{
-        duration: 0.85,
+        duration: 0.75,
         delay,
         ease: EASE,
       }}

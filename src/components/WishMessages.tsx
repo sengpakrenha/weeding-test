@@ -1,13 +1,12 @@
 "use client";
 
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { EASE } from "@/lib/motion";
 import { siteConfig } from "@/lib/site-config";
 import type { WishRecord } from "@/lib/messages";
 import { WISH_MAX_MESSAGE, WISH_MAX_NAME } from "@/lib/messages";
 import { FadeIn } from "./FadeIn";
-
-const EASE = [0.16, 1, 0.3, 1] as const;
 
 function formatWishDate(iso: string) {
   try {
@@ -18,6 +17,25 @@ function formatWishDate(iso: string) {
   } catch {
     return iso;
   }
+}
+
+function WishCard({ item }: { item: WishRecord }) {
+  return (
+    <article className="h-full rounded-2xl border border-gold/12 bg-white/95 p-7 shadow-card transition duration-500 hover:border-gold/25 hover:shadow-luxe md:p-9">
+      <div className="flex items-start justify-between gap-3 border-b border-gold/10 pb-4">
+        <p className="font-script text-[clamp(1.375rem,2.8vw,1.75rem)] leading-tight text-gold-dark">{item.name}</p>
+        <span
+          className="shrink-0 pt-0.5 text-[10px] uppercase tracking-[0.24em] text-muted"
+          title={item.createdAt}
+        >
+          {formatWishDate(item.createdAt)}
+        </span>
+      </div>
+      <p className="mt-5 whitespace-pre-wrap font-body text-[0.9375rem] leading-[1.82] text-ink/90 md:text-base md:leading-[1.85]">
+        {item.message}
+      </p>
+    </article>
+  );
 }
 
 export function WishMessages() {
@@ -105,11 +123,11 @@ export function WishMessages() {
   if (!wishes.enabled) return null;
 
   return (
-    <section id="wishes" className="section-y bg-ivory">
+    <section id="wishes" className="border-t border-gold/10 bg-ivory section-y">
       <div className="content-narrow">
         <FadeIn className="text-center">
           <p className="font-script text-3xl text-gold md:text-4xl lg:text-[2.75rem]">From the heart</p>
-          <h2 className="mt-5 font-serif text-3xl font-normal text-ink md:text-4xl lg:text-[2.75rem]">
+          <h2 className="font-heading mt-5 text-3xl font-medium text-ink md:text-4xl lg:text-[2.75rem]">
             {wishes.title}
           </h2>
           <p className="mx-auto mt-6 max-w-lg text-sm leading-relaxed text-muted md:text-base">
@@ -120,11 +138,11 @@ export function WishMessages() {
         <FadeIn className="mt-14 md:mt-16" delay={0.06}>
           <form
             onSubmit={handleSubmit}
-            className="space-y-8 border border-gold/20 bg-white/80 p-10 shadow-card backdrop-blur-sm md:p-12"
+            className="space-y-8 rounded-2xl border border-gold/15 bg-white/85 p-10 shadow-md backdrop-blur-sm md:p-12"
             noValidate
           >
             <div>
-              <label htmlFor="wish-name" className="block text-xs uppercase tracking-[0.2em] text-muted">
+              <label htmlFor="wish-name" className="block text-[10px] uppercase tracking-[0.22em] text-muted">
                 Your name <span className="text-gold-dark">*</span>
               </label>
               <input
@@ -137,8 +155,8 @@ export function WishMessages() {
                 autoComplete="name"
                 aria-invalid={touched.name && !!nameError}
                 aria-describedby={touched.name && nameError ? "wish-name-error" : undefined}
-                className={`mt-3 w-full border-b bg-transparent px-0 py-2.5 font-serif text-ink outline-none transition focus:border-gold ${
-                  touched.name && nameError ? "border-red-400/70" : "border-sand"
+                className={`mt-3 w-full rounded-xl border bg-white/80 px-4 py-3 font-body text-ink outline-none transition duration-300 ease-cinematic focus:border-[var(--memora-primary)] focus:ring-2 focus:ring-[var(--memora-primary)]/25 ${
+                  touched.name && nameError ? "border-red-400/70" : "border-gold/15"
                 }`}
                 placeholder="e.g. Alex Morgan"
               />
@@ -173,10 +191,10 @@ export function WishMessages() {
                 maxLength={WISH_MAX_MESSAGE}
                 aria-invalid={touched.message && !!messageError}
                 aria-describedby={touched.message && messageError ? "wish-message-error" : undefined}
-                className={`mt-3 w-full resize-y border px-4 py-3 font-serif text-ink outline-none transition focus:border-gold ${
+                className={`mt-3 w-full resize-y rounded-xl border px-4 py-3 font-body text-ink outline-none transition duration-300 ease-cinematic focus:border-[var(--memora-primary)] focus:ring-2 focus:ring-[var(--memora-primary)]/25 ${
                   touched.message && messageError
                     ? "border-red-400/70 bg-red-50/30"
-                    : "border-sand bg-white/60"
+                    : "border-gold/15 bg-white/75"
                 }`}
                 placeholder="A few kind words for the happy couple…"
               />
@@ -196,16 +214,16 @@ export function WishMessages() {
             <button
               type="submit"
               disabled={!isValid || isSubmitting}
-              className="w-full border border-gold bg-gold/10 py-3.5 font-serif text-xs uppercase tracking-[0.22em] text-ink transition duration-300 ease-cinematic enabled:hover:bg-gold/25 disabled:cursor-not-allowed disabled:border-sand disabled:bg-sand/40 disabled:text-muted disabled:opacity-80"
+              className="w-full rounded-xl border border-gold/20 bg-gradient-to-b from-gold/15 to-gold/10 py-3.5 font-heading text-xs uppercase tracking-[0.22em] text-ink transition duration-300 ease-cinematic enabled:hover:from-gold/25 enabled:hover:to-gold/20 disabled:cursor-not-allowed disabled:border-sand disabled:bg-sand/40 disabled:text-muted disabled:opacity-80"
             >
               {isSubmitting ? "Sending…" : "Share your wish"}
             </button>
           </form>
         </FadeIn>
 
-        <div className="mt-20 md:mt-24">
+        <div className="mt-16 md:mt-20">
           <FadeIn>
-            <h3 className="text-center font-serif text-xl font-normal text-ink md:text-2xl">
+            <h3 className="text-center font-heading text-lg font-medium tracking-tight text-ink md:text-xl">
               Wishes for {siteConfig.couple.partner1} & {siteConfig.couple.partner2}
             </h3>
           </FadeIn>
@@ -220,37 +238,34 @@ export function WishMessages() {
 
           {!loadingList && !loadError && list.length === 0 ? (
             <FadeIn className="mt-12">
-              <p className="text-center font-serif text-muted italic">No wishes yet — yours can be the first.</p>
+              <p className="text-center font-body text-muted italic">No wishes yet — yours can be the first.</p>
             </FadeIn>
           ) : null}
 
           {list.length > 0 ? (
-            <ul className="mt-12 grid gap-8 md:grid-cols-2 md:gap-10">
-              <AnimatePresence initial={false}>
-                {list.map((item) => (
-                  <motion.li
-                    key={item.id}
-                    initial={{ opacity: 0, y: 20, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.5, ease: EASE }}
-                  >
-                    <article className="group h-full border border-gold/18 bg-white/90 p-8 shadow-card transition duration-500 hover:border-gold/35 hover:shadow-luxe md:p-10">
-                      <div className="flex items-start justify-between gap-4 border-b border-gold/12 pb-5">
-                        <p className="font-script text-2xl text-gold-dark md:text-3xl">{item.name}</p>
-                        <span
-                          className="shrink-0 pt-1 text-[10px] uppercase tracking-[0.22em] text-muted"
-                          title={item.createdAt}
-                        >
-                          {formatWishDate(item.createdAt)}
-                        </span>
-                      </div>
-                      <p className="mt-6 whitespace-pre-wrap font-serif text-base leading-[1.85] text-ink/90">
-                        {item.message}
-                      </p>
-                    </article>
-                  </motion.li>
-                ))}
-              </AnimatePresence>
+            <ul className="mt-10 grid gap-7 md:grid-cols-2 md:gap-8">
+              {reduceMotion ? (
+                list.map((item) => (
+                  <li key={item.id}>
+                    <WishCard item={item} />
+                  </li>
+                ))
+              ) : (
+                <AnimatePresence initial={false}>
+                  {list.map((item) => (
+                    <motion.li
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, y: 24, scale: 0.98 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.96 }}
+                      transition={{ duration: 0.55, ease: EASE }}
+                    >
+                      <WishCard item={item} />
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
+              )}
             </ul>
           ) : null}
         </div>
