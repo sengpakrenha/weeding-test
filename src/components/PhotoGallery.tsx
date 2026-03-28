@@ -14,20 +14,18 @@ export function PhotoGallery() {
   const close = useCallback(() => setOpenIndex(null), []);
 
   const showPrev = useCallback(() => {
-    setOpenIndex((i) => {
-      const len = photos.length;
-      if (i === null || len === 0) return null;
-      return (i - 1 + len) % len;
-    });
-  }, [photos]);
+  setOpenIndex((i) => {
+    if (i === null || gallery.images.length === 0) return i; // return current value, not null
+    return (i - 1 + gallery.images.length) % gallery.images.length;
+  });
+}, [gallery.images.length]);
 
-  const showNext = useCallback(() => {
-    setOpenIndex((i) => {
-      const len = photos.length;
-      if (i === null || len === 0) return null;
-      return (i + 1) % len;
-    });
-  }, [photos]);
+const showNext = useCallback(() => {
+  setOpenIndex((i) => {
+    if (i === null || gallery.images.length === 0) return i; // return current value
+    return (i + 1) % gallery.images.length;
+  });
+}, [gallery.images.length]);
 
   /** Close lightbox if the list shrinks or index is out of range (production-safe). */
   useEffect(() => {
