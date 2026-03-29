@@ -35,7 +35,7 @@ export const siteConfig = {
     enabled: true,
     /** Use Memora demo speaker icon in the floating control */
     useMemoraIcon: true,
-    src: "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
+    src: "https://github.com/sengpakrenha/weeding-test/releases/download/v1.0/videoplayback.mp3",
   },
 
   hero: {
