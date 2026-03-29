@@ -165,19 +165,14 @@ export function CoverPage({ onOpen }: CoverPageProps) {
             <button
               type="button"
               onClick={onOpen}
-              className="group relative mx-auto flex min-h-[3.25rem] min-w-[min(72vw,300px)] items-center justify-center overflow-hidden rounded-sm px-10 py-3.5 text-[10px] font-heading uppercase tracking-[0.38em] text-ink shadow-glow-sm transition duration-500 ease-cinematic hover:scale-[1.03] hover:shadow-glow sm:min-w-[260px] sm:text-xs"
-              style={{
-                borderImage: `url(${memoraUrls.borderButton}) 30 stretch`,
-                borderWidth: 14,
-                borderStyle: "solid",
-              }}
               aria-label="Open invitation and enter the wedding website"
+              className="mx-auto block transition duration-500 ease-cinematic hover:scale-[1.03]"
             >
-              <span
-                className="absolute inset-0 bg-gradient-to-b from-[#fceaa3] via-[#f2b83e] to-[#d4a037] opacity-95 transition duration-500 group-hover:opacity-100"
-                aria-hidden
+              <img
+                src="/images/border-button.png"
+                alt="Open Invitation"
+                className="h-auto w-[min(72vw,300px)] sm:w-[260px]"
               />
-              <span className="relative z-10 drop-shadow-sm">Open Invitation</span>
             </button>
           ) : (
             <button
@@ -190,7 +185,7 @@ export function CoverPage({ onOpen }: CoverPageProps) {
                 className="absolute inset-0 bg-gradient-to-t from-white/0 to-white/25 opacity-0 transition group-hover:opacity-100"
                 aria-hidden
               />
-              <span className="relative z-10">Open Invitation</span>
+              <span className="relative z-10"></span>
             </button>
           )}
         </motion.div>
