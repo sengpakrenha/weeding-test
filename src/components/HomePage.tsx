@@ -1,8 +1,9 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { EASE } from "@/lib/motion";
+import { siteConfig } from "@/lib/site-config";
 import { Countdown } from "@/components/Countdown";
 import { CoverPage } from "@/components/CoverPage";
 import { EventDetails } from "@/components/EventDetails";
@@ -17,6 +18,7 @@ import { WishMessages } from "@/components/WishMessages";
 
 export function HomePage() {
   const [coverVisible, setCoverVisible] = useState(true);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     if (coverVisible) {
@@ -31,13 +33,21 @@ export function HomePage() {
 
   const invitationActive = !coverVisible;
 
+  // iOS requires audio.play() to be called directly inside a user tap handler
+  function handleOpen() {
+    if (siteConfig.music.enabled && audioRef.current) {
+      audioRef.current.muted = true;
+      void audioRef.current.play().catch(() => {});
+    }
+    setCoverVisible(false);
+  }
+
   return (
     <>
-      <MusicPlayer shouldPlay={invitationActive} />
-
+      <MusicPlayer shouldPlay={invitationActive} audioRef={audioRef} />
       <AnimatePresence mode="wait">
         {coverVisible ? (
-          <CoverPage key="cover" onOpen={() => setCoverVisible(false)} />
+          <CoverPage key="cover" onOpen={handleOpen} />
         ) : null}
       </AnimatePresence>
 
@@ -47,10 +57,7 @@ export function HomePage() {
           opacity: invitationActive ? 1 : 0,
           pointerEvents: invitationActive ? "auto" : "none",
         }}
-        transition={{
-          duration: 1,
-          ease: EASE,
-        }}
+        transition={{ duration: 1, ease: EASE }}
         className="min-h-screen"
         aria-hidden={coverVisible}
       >

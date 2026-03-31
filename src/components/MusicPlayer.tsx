@@ -2,7 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { EASE } from "@/lib/motion";
 import { memoraUrls } from "@/lib/memora-assets";
 import { siteConfig } from "@/lib/site-config";
@@ -14,6 +14,7 @@ const FADE_TOGGLE_MS = 320;
 
 type MusicPlayerProps = {
   shouldPlay: boolean;
+  audioRef?: React.RefObject<HTMLAudioElement | null>;
 };
 
 function IconVolumeOn() {
