@@ -56,12 +56,23 @@ export function Hero() {
         >
           {weddingDateDisplay}
         </p>
-        <p
-          className="mx-auto mt-6 max-w-md font-body text-[0.9375rem] italic leading-relaxed text-cream/88 sm:text-base motion-safe:animate-fade-in"
+        <div
+          className="mx-auto mt-6 max-w-2xl motion-safe:animate-fade-in"
           style={{ animationDelay: "0.65s", opacity: 0, animationFillMode: "forwards" }}
         >
-          {hero.subtitle}
-        </p>
+          {hero.subtitle.split("\n").map((line, i) => (
+            <p
+              key={i}
+              className={`text-center font-body leading-relaxed ${
+                i === 0
+                  ? "text-base font-khmer-heading text-[var(--memora-primary)] sm:text-lg"
+                  : "mt-3 text-[0.9375rem] text-cream/88 sm:text-base"
+              }`}
+            >
+              {line}
+            </p>
+          ))}
+        </div>
       </div>
 
       <a

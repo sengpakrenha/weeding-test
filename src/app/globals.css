@@ -163,6 +163,14 @@
     font-family: var(--font-script), cursive;
   }
 
+  .font-khmer-heading {
+    font-family: var(--font-khmer-heading), "Khmer OS", serif;
+  }
+
+  .font-khmer-body {
+    font-family: var(--font-khmer-body), "Khmer OS", sans-serif;
+  }
+
   .font-body {
     font-family: Celinda, Georgia, "Times New Roman", serif;
   }
