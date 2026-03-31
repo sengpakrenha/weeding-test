@@ -28,8 +28,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${playfair.variable} ${greatVibes.variable}`}>
-      <body className="font-body">{children}</body>
+    <html lang="en" className={`${playfair.variable} ${greatVibes.variable}`} suppressHydrationWarning>
+      <body className="font-body" suppressHydrationWarning>{children}</body>
     </html>
   );
 }

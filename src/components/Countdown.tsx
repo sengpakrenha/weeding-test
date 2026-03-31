@@ -35,14 +35,20 @@ function pad(n: number) {
 
 export function Countdown() {
   const target = useMemo(() => new Date(siteConfig.weddingDateISO), []);
+  const [mounted, setMounted] = useState(false);
   const [remaining, setRemaining] = useState<Remaining>(() => getRemaining(target));
 
+  useEffect(() => setMounted(true), []);
+
   useEffect(() => {
+    if (!mounted) return;
     const id = window.setInterval(() => {
       setRemaining(getRemaining(target));
     }, 1000);
     return () => window.clearInterval(id);
-  }, [target]);
+  }, [target, mounted]);
+
+  if (!mounted) return null;
 
   const blocks = remaining.past
     ? null

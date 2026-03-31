@@ -4,8 +4,8 @@
  */
 export const siteConfig = {
   couple: {
-    partner1: "Emma",
-    partner2: "James",
+    partner1: "peak kdey",
+    partner2: "srey nich",
     /** Shown under names, e.g. "Together with their families" */
     invitationLine: "Together with their families",
   },
@@ -105,14 +105,14 @@ export const siteConfig = {
      * When true, uses Memora demo gallery (portrait-main + landscape / portrait mix).
      * When false, uses `images` below (square grid).
      */
-    useMemoraAssets: true,
+    useMemoraAssets: false,
     /** Used when useMemoraAssets is false */
     images: [
-      "https://images.unsplash.com/photo-1606800052052-a08af7148866?w=800&q=80",
-      "https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=800&q=80",
-      "https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=800&q=80",
-      "https://images.unsplash.com/photo-1523438885200-e635ba2c371e?w=800&q=80",
-      "https://images.unsplash.com/photo-1522413452209-699e1a075087?w=800&q=80",
+      "https://69c906cda9fb0ef7c01361fe.imgix.net/photo-1.jpg?w=1280&h=853",
+      "https://69c906cda9fb0ef7c01361fe.imgix.net/photo-2.jpg",
+      "https://69c906cda9fb0ef7c01361fe.imgix.net/photo-3.jpg",
+      "https://69c906cda9fb0ef7c01361fe.imgix.net/photo-4.jpg",
+      "https://69c906cda9fb0ef7c01361fe.imgix.net/photo-6.jpg",
       "https://images.unsplash.com/photo-1591604466107-ec97de577aff?w=800&q=80",
     ],
   },

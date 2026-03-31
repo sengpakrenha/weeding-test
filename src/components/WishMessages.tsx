@@ -1,12 +1,14 @@
 "use client";
 
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FormEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import { EASE } from "@/lib/motion";
 import { siteConfig } from "@/lib/site-config";
 import type { WishRecord } from "@/lib/messages";
 import { WISH_MAX_MESSAGE, WISH_MAX_NAME } from "@/lib/messages";
 import { FadeIn } from "./FadeIn";
+
+const STORAGE_KEY = "wishes";
 
 function formatWishDate(iso: string) {
   try {
@@ -43,11 +45,9 @@ function WishCard({ item }: { item: WishRecord }) {
 export function WishMessages() {
   const { wishes } = siteConfig;
 
-  // ✅ FIX: correctly call hook
   const reduceMotion = useReducedMotion();
 
   const [list, setList] = useState<WishRecord[]>([]);
-  const [loadError, setLoadError] = useState<string | null>(null);
   const [loadingList, setLoadingList] = useState(true);
 
   const [name, setName] = useState("");
@@ -73,28 +73,25 @@ export function WishMessages() {
 
   const isValid = !nameError && !messageError;
 
-  const refresh = useCallback(async () => {
-    setLoadError(null);
-    setLoadingList(true);
+  useEffect(() => {
+    if (!wishes.enabled) return;
+
     try {
-      const res = await fetch("/api/messages");
-      if (!res.ok) throw new Error("Could not load wishes");
-      const data = (await res.json()) as WishRecord[];
-      setList(Array.isArray(data) ? data : []);
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const parsed = JSON.parse(stored) as WishRecord[];
+        setList(Array.isArray(parsed) ? parsed : []);
+      } else {
+        setList([]);
+      }
     } catch {
-      setLoadError("We couldn’t load wishes. Please refresh the page.");
       setList([]);
     } finally {
       setLoadingList(false);
     }
-  }, []);
+  }, [wishes.enabled]);
 
-  useEffect(() => {
-    if (!wishes.enabled) return;
-    void refresh();
-  }, [wishes.enabled, refresh]);
-
-  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setTouched({ name: true, message: true });
     setSubmitError(null);
@@ -102,25 +99,22 @@ export function WishMessages() {
 
     setIsSubmitting(true);
     try {
-      const res = await fetch("/api/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: nameTrimmed,
-          message: messageTrimmed,
-        }),
-      });
-      const data = (await res.json()) as WishRecord & { error?: string };
-      if (!res.ok) {
-        setSubmitError(data.error ?? "Something went wrong. Please try again.");
-        return;
-      }
-      setList((prev) => [data, ...prev.filter((m) => m.id !== data.id)]);
+      const newWish: WishRecord = {
+        id: Date.now().toString(),
+        name: nameTrimmed,
+        message: messageTrimmed,
+        createdAt: new Date().toISOString(),
+      };
+
+      const updatedList = [newWish, ...list];
+      setList(updatedList);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+
       setName("");
       setMessage("");
       setTouched({ name: false, message: false });
     } catch {
-      setSubmitError("Network error. Please try again.");
+      setSubmitError("Something went wrong. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -144,14 +138,75 @@ export function WishMessages() {
         </FadeIn>
 
         <FadeIn className="mt-14 md:mt-16" delay={0.06}>
-        <form
-          onSubmit={handleSubmit}
-          className="space-y-8 rounded-2xl border border-gold/15 bg-white/85 p-10 shadow-md backdrop-blur-sm md:p-12"
-          noValidate
-        >
-          {/* KEEP ALL YOUR EXISTING INPUTS HERE */}
-        </form>
-      </FadeIn>
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-8 rounded-2xl border border-gold/15 bg-white/85 p-10 shadow-md backdrop-blur-sm md:p-12"
+            noValidate
+          >
+            <div className="space-y-2">
+              <label
+                htmlFor="wish-name"
+                className="block font-body text-sm font-medium text-ink"
+              >
+                Your Name
+              </label>
+              <input
+                id="wish-name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={() => setTouched((prev) => ({ ...prev, name: true }))}
+                maxLength={WISH_MAX_NAME}
+                placeholder="Enter your name"
+                className="w-full rounded-xl border border-gold/20 bg-white/80 px-4 py-3 font-body text-ink placeholder:text-muted/60 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/10"
+              />
+              {touched.name && nameError && (
+                <p className="text-sm text-red-700">{nameError}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label
+                htmlFor="wish-message"
+                className="block font-body text-sm font-medium text-ink"
+              >
+                Your Wish
+              </label>
+              <textarea
+                id="wish-message"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onBlur={() => setTouched((prev) => ({ ...prev, message: true }))}
+                maxLength={WISH_MAX_MESSAGE}
+                rows={4}
+                placeholder="Write your heartfelt wish..."
+                className="w-full resize-none rounded-xl border border-gold/20 bg-white/80 px-4 py-3 font-body text-ink placeholder:text-muted/60 focus:border-gold/40 focus:outline-none focus:ring-2 focus:ring-gold/10"
+              />
+              <div className="flex items-center justify-between">
+                {touched.message && messageError ? (
+                  <p className="text-sm text-red-700">{messageError}</p>
+                ) : (
+                  <span />
+                )}
+                <span className="text-xs text-muted">
+                  {messageTrimmed.length}/{WISH_MAX_MESSAGE}
+                </span>
+              </div>
+            </div>
+
+            {submitError && (
+              <p className="text-center text-sm text-red-700">{submitError}</p>
+            )}
+
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full rounded-xl bg-gold px-8 py-4 font-heading text-sm font-medium tracking-wide text-white shadow-md transition hover:bg-gold-dark hover:shadow-lg disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting ? "Sending..." : "Send Wish"}
+            </button>
+          </form>
+        </FadeIn>
 
         <div className="mt-16 md:mt-20">
           <FadeIn>
@@ -160,15 +215,11 @@ export function WishMessages() {
             </h3>
           </FadeIn>
 
-          {loadError && (
-            <p className="mt-10 text-center text-sm text-red-800/90">{loadError}</p>
-          )}
-
-          {loadingList && !loadError && (
+          {loadingList && (
             <p className="mt-12 text-center text-sm text-muted">Loading wishes…</p>
           )}
 
-          {!loadingList && !loadError && list.length === 0 && (
+          {!loadingList && list.length === 0 && (
             <FadeIn className="mt-12">
               <p className="text-center font-body text-muted italic">
                 No wishes yet — yours can be the first.
@@ -204,6 +255,6 @@ export function WishMessages() {
           )}
         </div>
       </div>
-      </section>
+    </section>
   );
 }
