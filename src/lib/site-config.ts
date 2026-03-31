@@ -4,10 +4,10 @@
  */
 export const siteConfig = {
   couple: {
-    partner1: "peak kdey",
-    partner2: "srey nich",
+    partner1: "ប្រឹម ភក្ដី",
+    partner2: "ស្រីនិច",
     /** Shown under names, e.g. "Together with their families" */
-    invitationLine: "Together with their families",
+    invitationLine: "កម្មវិធីមង្គលអាពាហ៍ពិពាហ៍",
   },
 
   /** ISO 8601 — used for countdown and display formatting */
@@ -42,7 +42,7 @@ export const siteConfig = {
     /** Full-bleed background — swap for /your-photo.jpg in public/ */
     backgroundImage:
       "https://images.unsplash.com/photo-1519741497674-611481863552?w=1920&q=80",
-    subtitle: "Invite you to celebrate their wedding",
+    subtitle: "សូមគោរពអញ្ជើញ\nសម្ដេច ទ្រង់ ឯកឧត្ដម លោកឧកញ៉ា លោកជំទាវ លោក លោកស្រី អ្នកនាង កញ្ញា និង ប្រិយមិត្ត អញ្ជើញចូលរួម ជាអធិបតី និង ជាភ្ញៀវកិត្តិយស ដើម្បីប្រសិទ្ធពរជ័យ សិរិសួស្ដី ជ័យមង្គល ក្នុងពិធីរៀបអាពាហ៍ពិពាហ៍ កូនប្រុស-ស្រី របស់យើងខ្ញុំ។",
   },
 
   story: {
