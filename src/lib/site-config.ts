@@ -122,7 +122,7 @@ export const siteConfig = {
   },
 
   rsvp: {
-    enabled: true,
+    enabled: false,
     title: "Kindly RSVP",
     subtitle:
       "We would love to know if you can celebrate with us. This form is for your convenience only — no data is sent to a server.",
