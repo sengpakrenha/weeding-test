@@ -8,8 +8,6 @@ import type { WishRecord } from "@/lib/messages";
 import { WISH_MAX_MESSAGE, WISH_MAX_NAME } from "@/lib/messages";
 import { FadeIn } from "./FadeIn";
 
-const STORAGE_KEY = "wishes";
-
 function formatWishDate(iso: string) {
   try {
     return new Intl.DateTimeFormat(undefined, {
@@ -73,25 +71,20 @@ export function WishMessages() {
 
   const isValid = !nameError && !messageError;
 
+  // Load wishes from API
   useEffect(() => {
     if (!wishes.enabled) return;
-
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const parsed = JSON.parse(stored) as WishRecord[];
-        setList(Array.isArray(parsed) ? parsed : []);
-      } else {
-        setList([]);
-      }
-    } catch {
-      setList([]);
-    } finally {
-      setLoadingList(false);
-    }
+    fetch("/api/messages")
+      .then((res) => res.json())
+      .then((data: WishRecord[]) => {
+        setList(Array.isArray(data) ? data : []);
+      })
+      .catch(() => setList([]))
+      .finally(() => setLoadingList(false));
   }, [wishes.enabled]);
 
-  function handleSubmit(e: FormEvent<HTMLFormElement>) {
+  // Submit wish to API
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setTouched({ name: true, message: true });
     setSubmitError(null);
@@ -99,17 +92,16 @@ export function WishMessages() {
 
     setIsSubmitting(true);
     try {
-      const newWish: WishRecord = {
-        id: Date.now().toString(),
-        name: nameTrimmed,
-        message: messageTrimmed,
-        createdAt: new Date().toISOString(),
-      };
+      const res = await fetch("/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: nameTrimmed, message: messageTrimmed }),
+      });
 
-      const updatedList = [newWish, ...list];
-      setList(updatedList);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList));
+      if (!res.ok) throw new Error("Failed to submit");
 
+      const newWish: WishRecord = await res.json();
+      setList((prev) => [newWish, ...prev]);
       setName("");
       setMessage("");
       setTouched({ name: false, message: false });
