@@ -168,9 +168,11 @@ export function CoverPage({ onOpen }: CoverPageProps) {
               aria-label="Open invitation and enter the wedding website"
               className="mx-auto block transition duration-500 ease-cinematic hover:scale-[1.03]"
             >
-              <img
+              <Image
                 src="/images/border-button.png"
                 alt="Open Invitation"
+                width={300}
+                height={80}
                 className="h-auto w-[min(72vw,300px)] sm:w-[260px]"
               />
             </button>

@@ -45,7 +45,7 @@ export async function POST(req: Request) {
   }
 
   const newMessage: WishRecord = {
-    id: Date.now(),
+    id: Date.now().toString(),
     name,
     message,
     createdAt: new Date().toISOString(),
