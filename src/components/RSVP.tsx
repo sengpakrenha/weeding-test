@@ -4,12 +4,16 @@ import { FormEvent, useState } from "react";
 import { siteConfig } from "@/lib/site-config";
 import { FadeIn } from "./FadeIn";
 
+const GOOGLE_SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxbui4BrEQBs5dOReOsv_EZ2jMaB9a0RnLqsq08TJYaL9SnDAlp0XxQdO3FR1v2ESvb/exec";
+
 const inputClass =
   "mt-2.5 w-full rounded-xl border border-gold/15 bg-white/70 px-4 py-2.5 font-body text-[0.9375rem] text-ink outline-none backdrop-blur-sm transition duration-300 ease-cinematic placeholder:text-muted/55 focus:border-[var(--memora-primary)] focus:ring-2 focus:ring-[var(--memora-primary)]/20 md:py-3 md:text-base";
 
 export function RSVP() {
   const { rsvp } = siteConfig;
   const [submitted, setSubmitted] = useState(false);
+  const [sending, setSending] = useState(false);
 
   if (!rsvp.enabled) return null;
 
@@ -17,9 +21,21 @@ export function RSVP() {
     e.preventDefault();
     const fd = new FormData(e.currentTarget);
     const data = Object.fromEntries(fd.entries());
-    console.log("RSVP (frontend only — not sent):", data);
-    setSubmitted(true);
-    e.currentTarget.reset();
+
+    setSending(true);
+
+    fetch(GOOGLE_SCRIPT_URL, {
+      method: "POST",
+      mode: "no-cors",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    })
+      .catch(() => {})
+      .finally(() => {
+        setSending(false);
+        setSubmitted(true);
+        e.currentTarget?.reset();
+      });
   }
 
   return (
@@ -104,14 +120,14 @@ export function RSVP() {
             </div>
             <button
               type="submit"
-              className="w-full rounded-xl border border-gold/20 bg-gradient-to-b from-gold/15 to-gold/10 py-3 font-heading text-[10px] uppercase tracking-[0.24em] text-ink transition duration-300 ease-cinematic hover:from-gold/25 hover:to-gold/20 md:py-3.5 md:text-xs"
+              disabled={sending}
+              className="w-full rounded-xl border border-gold/20 bg-gradient-to-b from-gold/15 to-gold/10 py-3 font-heading text-[10px] uppercase tracking-[0.24em] text-ink transition duration-300 ease-cinematic hover:from-gold/25 hover:to-gold/20 disabled:opacity-60 md:py-3.5 md:text-xs"
             >
-              Send RSVP
+              {sending ? "Sending…" : "Send RSVP"}
             </button>
             {submitted ? (
               <p className="text-center text-[0.9375rem] leading-relaxed text-muted" role="status">
-                Thank you — your details were logged in the browser only. Connect a backend or form
-                service when you are ready.
+                Thank you! Your RSVP has been received. We look forward to celebrating with you! 🎉
               </p>
             ) : null}
           </form>
